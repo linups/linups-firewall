@@ -1,0 +1,24 @@
+{
+    "name": "linups/linups-firewall",
+    "description": "Learning packages",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Linas"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Linups\\LinupsFirewall\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Linups\\LinupsFirewall\\LinupsFirewallServiceProvider"
+            ]
+        }
+    }
+}
