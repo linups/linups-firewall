@@ -17,7 +17,7 @@ class LinupsFirewallMiddleware
             if($LinupsFirewallService->checkIfRequestMadeByWebSpider()) {
                 //--- For testing only
                 mail(config('linups-config.notification_email'), 'Banned Crawler!', '<pre>'.print_r($_SERVER, true).'</pre>');
-                
+
                 return response('You\'re not allowed to crawl!', 403);
             }
         } catch (\Throwable $ex) {

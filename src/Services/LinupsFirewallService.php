@@ -40,7 +40,7 @@ class LinupsFirewallService {
     }
 
     public function checkIfRequestMadeByWebSpider() {
-        $keywords = cache()->remember('keywords', 60*60*24, function() {
+        $keywords = cache()->remember('keywords', 60*60, function() {
             return Keyword::all();
         });
 
