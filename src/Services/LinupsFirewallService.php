@@ -52,6 +52,8 @@ class LinupsFirewallService {
                 if(stristr(request()->fullUrl(), $keyword->keyword)) {
                     //--- Saving banned ip in DB
                     BannedIp::firstOrCreate(['ip' => \Request::ip()],['ip' => \Request::ip()]);
+                    //--- Logging banned think
+                    \Log::debug('Banning: <pre>'.print_r($_SERVER, true).'</pre>');
                     //--- Banning on cloudflare
                     return $this->BanIpOnCloudflare(\Request::ip());
                 }
