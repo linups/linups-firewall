@@ -13,7 +13,7 @@ class LinupsFirewallService {
     private $accountID;
 
     public function __construct() {
-        $this->endpoint = 'https://api.cloudflare.com/client/v4/accounts';
+        $this->endpoint = config('linups-config.cloudflare_endpoint');
         $this->authKey = config('linups-config.cloudflare_auth_key');
         $this->authEmail = config('linups-config.cloudflare_auth_email');
         $this->listID = config('linups-config.cloudflare_list_id');
@@ -30,11 +30,14 @@ class LinupsFirewallService {
     }
 
     public function BanIpOnCloudflare(string $ip) {
+        $request = new \stdClass();
+        $request->ip = $ip;
+
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'X-Auth-Email' => $this->authEmail,
             'X-Auth-Key' => $this->authKey
-        ])->withBody('[{"ip":"'.$ip.'"}]')->post($this->endpoint.'/'.$this->accountID.'/rules/lists/'.$this->listID.'/items');
+        ])->post($this->endpoint.'/'.$this->accountID.'/rules/lists/'.$this->listID.'/items', [$request]);
 
         return $response->body();
     }
