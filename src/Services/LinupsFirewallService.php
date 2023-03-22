@@ -53,7 +53,11 @@ class LinupsFirewallService {
                     //--- Saving banned ip in DB
                     BannedIp::firstOrCreate(['ip' => \Request::ip()],['ip' => \Request::ip()]);
                     //--- Logging banned think
-                    \Log::debug('Banning: <pre>'.print_r($_SERVER, true).'</pre>');
+                    \Log::debug('Banning: <pre>'.print_r([
+                            'REQUEST_URI' => $_SERVER['REQUEST_URI'] ?? '',
+                            'REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'] ?? '',
+                            'HTTP_USER_AGENT' => $_SERVER['HTTP_USER_AGENT'] ?? '',
+                        ], true).'</pre>');
                     //--- Banning on cloudflare
                     return $this->BanIpOnCloudflare(\Request::ip());
                 }
