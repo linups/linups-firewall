@@ -30,16 +30,21 @@ class LinupsFirewallService {
     }
 
     public function BanIpOnCloudflare(string $ip) {
-        $request = new \stdClass();
-        $request->ip = $ip;
+        $requestData = new \stdClass();
+        $requestData->ip = $ip;
 
-        $response = Http::withHeaders([
+        $responseJson = Http::withHeaders([
             'Content-Type' => 'application/json',
             'X-Auth-Email' => $this->authEmail,
             'X-Auth-Key' => $this->authKey
-        ])->post($this->endpoint.'/'.$this->accountID.'/rules/lists/'.$this->listID.'/items', [$request]);
+        ])->post($this->endpoint.'/'.$this->accountID.'/rules/lists/'.$this->listID.'/items', [$requestData]);
 
-        return $response->body();
+        $response = json_decode($responseJson->body());
+        if($response->success == true) {
+            return $response;
+        }
+
+        throw new \Exception('Invalid response. Debug:'.print_r($response, true));
     }
 
     public function checkIfRequestMadeByWebSpider() {
@@ -67,38 +72,32 @@ class LinupsFirewallService {
 
     public function updateIpListOnCloudflare(array $ipList) {
         if(count($ipList)>0) {
-            $ipString = '[';
-            $i = 0;
+            $collection = collect();
             foreach ($ipList as $ip) {
-                if($i != 0) $ipString .= ',';
-                $ipString .= '{"ip":"'.$ip.'"}';
-                $i++;
+                $tmpIP = new \stdClass();
+                if(strlen($ip) > 15) {
+                    $ipsarray = explode('::', $ip);
+                    $tmpIP->ip = $ipsarray[0] .'::/64';
+                } else {
+                    $tmpIP->ip = $ip;
+                }
+                $collection->push($tmpIP);
             }
-            $ipString .= ']';
         }
 
-        $response = Http::withHeaders([
+        $responseJson = Http::withHeaders([
             'Content-Type' => 'application/json',
             'X-Auth-Email' => $this->authEmail,
             'X-Auth-Key' => $this->authKey
-        ])->withBody($ipString)->put($this->endpoint.'/'.$this->accountID.'/rules/lists/'.$this->listID.'/items');
+        ])->put($this->endpoint.'/'.$this->accountID.'/rules/lists/'.$this->listID.'/items', $collection);
 
-        return $response->body();
+        $response = json_decode($responseJson->body());
+
+        if($response->success !== true) {
+            throw new \Exception('List not updated..'.print_r($response, true).print_r($collection, true));
+        }
+
+        return $response;
     }
 
-
-
-    /**
-    public function BanIpOnCloudflare(string $ip) {
-    $response = Http::withHeaders([
-    'Content-Type' => 'application/json',
-    'X-Auth-Email' => 'linas.gutauskas@gmail.com',
-    'X-Auth-Key' => 'a3df829e4babba5a76c8ac9b341f836ea6b91'
-    ])->post('https://api.cloudflare.com/client/v4/accounts/d963634ba6774d19fd56547c2b8138a2/rules/lists/5d5a2a8816a1439dbd7ca59713c2a7e2/items', [
-    json_encode($ip),
-    ]);
-
-    dd($response->body());
-    }
-     ***/
 }
