@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use Linups\LinupsFirewall\Services\LinupsFirewallService;
 
+
 Route::get('/test', function () {
     $LinupsFirewallService = new LinupsFirewallService();
 
