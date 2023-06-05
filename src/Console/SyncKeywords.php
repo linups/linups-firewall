@@ -13,13 +13,12 @@ class SyncKeywords extends Command
 
     public function handle()
     {
-        if(config('linups-config.sync_with_main_project') !== true) return;
+        if(config('linups-config.sync_with_main_project') != 'enabled') return;
 
-        dd('passed');
-        $response = Http::get(config('linups-config.sync_project_endpoint'), [
+        $response = Http::get(config('linups-config.sync_project_endpoint').'/api/v1/get-keyword-list', [
             'page' => 1,
         ]);
 
-        dd($response);
+        dd($response->getBody()->getContents());
     }
 }
