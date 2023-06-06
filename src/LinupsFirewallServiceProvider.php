@@ -29,7 +29,7 @@ class LinupsFirewallServiceProvider extends ServiceProvider
             ->middleware(['web', 'linups-firewall'])
             ->group(function () {
                 $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
-                $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+//                $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
             });
 
 ////////////
@@ -50,8 +50,9 @@ class LinupsFirewallServiceProvider extends ServiceProvider
             //--- Cron
             $this->app->booted(function () {
                 $schedule = $this->app->make(Schedule::class);
-                $schedule->command('clear:old-banned-ip')->dailyAt('03:00');
-                $schedule->command('update:banned-ips-on-cloudflare')->dailyAt('04:00');
+                $schedule->command('clear:old-banned-ip')->dailyAt('03:03');
+                $schedule->command('update:banned-ips-on-cloudflare')->dailyAt('04:06');
+                $schedule->command('sync:Keywords')->dailyAt('05:09');
             });
             // In addition to publishing assets, we also publish the config
             $this->publishes([

@@ -4,6 +4,7 @@ namespace Linups\LinupsFirewall\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
+use Linups\LinupsFirewall\Models\Keyword;
 
 class SyncKeywords extends Command
 {
@@ -15,10 +16,16 @@ class SyncKeywords extends Command
     {
         if(config('linups-config.sync_with_main_project') != 'enabled') return;
 
-        $response = Http::get(config('linups-config.sync_project_endpoint').'/api/v1/get-keyword-list', [
+        $response = Http::get(config('linups-config.sync_project_endpoint').'/linups-firewall/v1/get-keyword-list', [
             'page' => 1,
         ]);
 
-        dd($response->getBody()->getContents());
+        $responseRaw = ($response->getBody()->getContents());
+        $responseData = json_decode($responseRaw);
+        if(count($responseData) > 0) {
+            foreach($responseData as $keyword) {
+                Keyword::updateOrCreate(['keyword' => $keyword->keyword]);
+            }
+        }
     }
 }
