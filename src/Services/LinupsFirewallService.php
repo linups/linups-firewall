@@ -48,6 +48,10 @@ class LinupsFirewallService {
     }
 
     public function checkIfRequestMadeByWebSpider() {
+        //--- Skipping IPv6 ips
+        if(stristr($_SERVER['REMOTE_ADDR'], '::')) {
+            return;
+        }
         $keywords = cache()->remember('keywords', 60*60, function() {
             return Keyword::all();
         });
