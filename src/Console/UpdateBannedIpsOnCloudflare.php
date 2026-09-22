@@ -19,13 +19,14 @@ class UpdateBannedIpsOnCloudflare extends Command
     {
         $LinupsFirewallService = new LinupsFirewallService();
 
-        $bannedIpList = BannedIp::select('ip')->limit(10000)->get();
+        $bannedIpList = BannedIp::select('ip')->distinct()->limit(10000)->get();
         if($bannedIpList->isNotEmpty()) {
             $ipArray = [];
             foreach($bannedIpList as $ip) {
                 $ipArray[] = $ip->ip;
             }
-            dd($LinupsFirewallService->updateIpListOnCloudflare($ipArray));
+            $response = $LinupsFirewallService->updateIpListOnCloudflare($ipArray);
+            $this->line(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         }
     }
 }
