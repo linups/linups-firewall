@@ -14,6 +14,10 @@ class ClearOldBannedIp extends Command
 
     public function handle(): void
     {
-        BannedIp::where('created_at', '<', Carbon::now()->subDays(30))->delete();
+        $days = (int) config('linups-config.ban_duration_days', 30);
+
+        $deleted = BannedIp::where('created_at', '<', Carbon::now()->subDays($days))->delete();
+
+        $this->line("Deleted {$deleted} banned ips older than {$days} days.");
     }
 }

@@ -1,6 +1,7 @@
 {
     "name": "linups/linups-firewall",
-    "description": "Learning packages",
+    "description": "Laravel middleware that bans web crawlers by URL keyword and syncs banned IPs to a Cloudflare IP list",
+    "keywords": ["laravel", "firewall", "cloudflare", "crawler", "middleware"],
     "license": "MIT",
     "authors": [
         {
@@ -8,11 +9,29 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {},
+    "prefer-stable": true,
+    "require": {
+        "php": "^8.1",
+        "illuminate/console": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/database": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/http": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/support": "^10.0|^11.0|^12.0|^13.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0"
+    },
     "autoload": {
         "psr-4": {
             "Linups\\LinupsFirewall\\": "src"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Linups\\LinupsFirewall\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
     },
     "extra": {
         "laravel": {
