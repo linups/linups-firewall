@@ -30,6 +30,8 @@ class LinupsFirewallServiceProvider extends ServiceProvider
                 $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
             });
 
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'linups-firewall');
+
         if ($this->app->runningInConsole()) {
             $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 

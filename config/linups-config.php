@@ -16,6 +16,13 @@ return [
     // Address that receives an e-mail for every banned crawler. Leave empty to disable.
     'notification_email' => env('notification_email'),
 
+    // Also e-mail notification_email about every 404, with a signed "Add url to ban list" link.
+    'not_found_notification' => (bool) env('not_found_notification', false),
+    // The same URL is reported at most once per this many minutes (0 = every hit).
+    'not_found_throttle_minutes' => (int) env('not_found_throttle_minutes', 60),
+    // How long the "Add url to ban list" link stays valid.
+    'ban_link_expires_days' => (int) env('ban_link_expires_days', 7),
+
     // Banned IPs older than this are removed by `clear:old-banned-ip`.
     'ban_duration_days' => (int) env('ban_duration_days', 30),
 
