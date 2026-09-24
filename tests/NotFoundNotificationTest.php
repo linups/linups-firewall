@@ -28,7 +28,16 @@ class NotFoundNotificationTest extends TestCase
 
     private function signedBanUrl(string $url = '/missing-page?a=1'): string
     {
-        return URL::temporarySignedRoute('linups-firewall.ban-url', now()->addDay(), ['url' => $url]);
+        return url(URL::temporarySignedRoute('linups-firewall.ban-url', now()->addDay(), ['url' => $url], false));
+    }
+
+    private function banLinkFromMail(): string
+    {
+        $html = $this->sentMessages()->last()->getOriginalMessage()->getHtmlBody();
+        preg_match('/href="([^"]+ban-url[^"]+)"/', $html, $m);
+        $this->assertNotEmpty($m);
+
+        return html_entity_decode($m[1]);
     }
 
     public function test_404_sends_mail_with_details_and_signed_ban_link(): void
@@ -48,9 +57,20 @@ class NotFoundNotificationTest extends TestCase
         $this->assertStringContainsString('Add url to ban list', $html);
         $this->assertStringNotContainsString('secret-cookie', $html);
 
-        preg_match('/href="([^"]+ban-url[^"]+)"/', $html, $m);
-        $this->assertNotEmpty($m);
-        $this->get(html_entity_decode($m[1]))->assertOk()->assertSee('value="/missing-page?a=1"', false);
+        $this->get($this->banLinkFromMail())->assertOk()->assertSee('value="/missing-page?a=1"', false);
+    }
+
+    public function test_ban_link_works_when_proxy_hides_https(): void
+    {
+        //--- Behind Cloudflare without trusted proxies: links are built as https, requests arrive as http
+        URL::forceScheme('https');
+        $this->get('/missing-page')->assertNotFound();
+        URL::forceScheme('http');
+
+        $link = $this->banLinkFromMail();
+        $this->assertStringStartsWith('https://localhost/linups-firewall/ban-url?', $link);
+
+        $this->get(str_replace('https://', 'http://', $link))->assertOk()->assertSee('value="/missing-page"', false);
     }
 
     public function test_existing_page_sends_no_mail(): void

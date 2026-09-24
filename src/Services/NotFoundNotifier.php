@@ -37,11 +37,14 @@ class NotFoundNotifier
             return;
         }
 
-        $banUrl = URL::temporarySignedRoute(
+        //--- Only path + query are signed: behind a proxy (Cloudflare) the app may build the link
+        //--- as https but see the incoming request as http, which would break an absolute signature
+        $banUrl = url(URL::temporarySignedRoute(
             'linups-firewall.ban-url',
             now()->addDays((int) config('linups-config.ban_link_expires_days', 7)),
-            ['url' => $request->getRequestUri()]
-        );
+            ['url' => $request->getRequestUri()],
+            false
+        ));
 
         Mail::send('linups-firewall::emails.not-found', [
             'url' => $request->fullUrl(),

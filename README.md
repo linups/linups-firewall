@@ -38,8 +38,8 @@ With `not_found_notification=true`, each 404 sends a mail containing a link to
 `/linups-firewall/ban-url`. The page needs no login: the link is a signed URL that expires
 after `ban_link_expires_days`, so it cannot be forged or edited. The form is pre-filled with
 the requested path, which you can shorten before saving it to the `keywords` table.
-Signed links rely on `APP_KEY` and on the app seeing the correct scheme/host (configure
-trusted proxies when running behind Cloudflare or a load balancer).
+Signed links rely on `APP_KEY`. Only the path and query are signed, so the link keeps
+working behind Cloudflare or a load balancer even without trusted proxies.
 
 ## Scheduled commands
 

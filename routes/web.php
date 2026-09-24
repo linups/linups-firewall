@@ -8,8 +8,9 @@ Route::prefix('v1')->group(function () {
     Route::get('/get-keyword-list', [FirewallController::class, 'getKeywordList']);
 });
 
-//--- Link from the 404 e-mail; the signature replaces authentication
-Route::middleware(ValidateSignature::class)->group(function () {
+//--- Link from the 404 e-mail; the signature replaces authentication.
+//--- Relative: scheme and host are not signed, so the link survives proxies.
+Route::middleware(ValidateSignature::class . ':relative')->group(function () {
     Route::get('/ban-url', [BanUrlController::class, 'create'])->name('linups-firewall.ban-url');
     Route::post('/ban-url', [BanUrlController::class, 'store']);
 });
