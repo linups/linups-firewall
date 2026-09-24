@@ -83,21 +83,17 @@ class MiddlewareTest extends TestCase
             && ! $r->hasHeader('X-Auth-Key'));
     }
 
-    public function test_notification_email_contains_no_server_secrets(): void
+    public function test_banned_crawler_sends_no_mail(): void
     {
-        config(['linups-config.notification_email' => 'admin@example.test']);
+        config([
+            'linups-config.notification_email' => 'admin@example.test',
+            'linups-config.not_found_notification' => true,
+        ]);
         Http::fake([self::LIST_ITEMS_URL => Http::response(['success' => true])]);
         Keyword::create(['keyword' => 'wp-login']);
-        $_SERVER['SOME_SECRET'] = 'hunter2';
 
         $this->get('/wp-login.php')->assertForbidden();
 
-        $messages = $this->app['mailer']->getSymfonyTransport()->messages();
-        $this->assertCount(1, $messages);
-        $body = $messages->first()->getOriginalMessage()->getTextBody();
-        $this->assertStringContainsString('127.0.0.1', $body);
-        $this->assertStringNotContainsString('hunter2', $body);
-
-        unset($_SERVER['SOME_SECRET']);
+        $this->assertCount(0, $this->app['mailer']->getSymfonyTransport()->messages());
     }
 }

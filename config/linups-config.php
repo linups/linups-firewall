@@ -13,10 +13,10 @@ return [
     'cloudflare_list_id' => env('cloudflare_list_id'),
     'cloudflare_account_id' => env('cloudflare_account_id'),
 
-    // Address that receives an e-mail for every banned crawler. Leave empty to disable.
+    // Address that receives the 404 notifications. Leave empty to disable.
     'notification_email' => env('notification_email'),
 
-    // Also e-mail notification_email about every 404, with a signed "Add url to ban list" link.
+    // E-mail notification_email about every 404, with a signed "Add url to ban list" link.
     'not_found_notification' => (bool) env('not_found_notification', false),
     // The same URL is reported at most once per this many minutes (0 = every hit).
     'not_found_throttle_minutes' => (int) env('not_found_throttle_minutes', 60),

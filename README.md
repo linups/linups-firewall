@@ -23,8 +23,8 @@ The middleware is registered globally by the service provider. It is also availa
 | `cloudflare_auth_email`, `cloudflare_auth_key` | Legacy Global API Key auth, used only when no token is set. |
 | `cloudflare_account_id`, `cloudflare_list_id` | Target IP list. |
 | `cloudflare_endpoint` | Defaults to `https://api.cloudflare.com/client/v4/accounts`. |
-| `notification_email` | Receives a mail (IP, URL, user agent) per banned crawler. Empty = off. |
-| `not_found_notification` | `true` to also mail `notification_email` about every 404 (URL, time, request details) with an *Add url to ban list* link. Default off. |
+| `notification_email` | Receives the 404 notifications. Empty = off. Banned crawlers are not mailed. |
+| `not_found_notification` | `true` to mail `notification_email` about every 404 (URL, time, request details) with an *Add url to ban list* link. Default off. |
 | `not_found_throttle_minutes` | Report the same URL at most once per this many minutes, default `60`. `0` = every hit. |
 | `ban_link_expires_days` | Validity of the signed *Add url to ban list* link, default `7`. |
 | `ban_duration_days` | Local ban retention, default `30`. |
