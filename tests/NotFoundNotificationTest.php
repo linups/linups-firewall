@@ -2,8 +2,10 @@
 
 namespace Linups\LinupsFirewall\Tests;
 
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
+use Linups\LinupsFirewall\Models\BannedIp;
 use Linups\LinupsFirewall\Models\Keyword;
 
 class NotFoundNotificationTest extends TestCase
@@ -131,6 +133,31 @@ class NotFoundNotificationTest extends TestCase
             ->assertSee('already in the ban list', false);
 
         $this->assertSame(['/missing-page'], Keyword::pluck('keyword')->all());
+    }
+
+    public function test_ban_link_for_already_banned_keyword_does_not_ban_admin(): void
+    {
+        Keyword::create(['keyword' => '.git']);
+        $url = $this->signedBanUrl('/.git/config');
+
+        $this->get($url)->assertOk()->assertSee('value="/.git/config"', false);
+        $this->followingRedirects()
+            ->post($url, ['keyword' => '.git/config'])
+            ->assertOk()
+            ->assertSee('added to the ban list', false);
+
+        $this->assertSame(0, BannedIp::count());
+        Http::assertNothingSent();
+    }
+
+    public function test_unsigned_ban_url_with_keyword_is_still_banned(): void
+    {
+        Http::fake([self::LIST_ITEMS_URL => Http::response(['success' => true])]);
+        Keyword::create(['keyword' => '.git']);
+
+        $this->get('/linups-firewall/ban-url?url=/.git/config')->assertForbidden();
+
+        $this->assertSame(1, BannedIp::count());
     }
 
     public function test_ban_form_rejects_too_short_keyword(): void

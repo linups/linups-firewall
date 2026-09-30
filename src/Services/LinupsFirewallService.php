@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 use Linups\LinupsFirewall\Models\BannedIp;
 use Linups\LinupsFirewall\Models\Keyword;
 use RuntimeException;
@@ -67,6 +68,12 @@ class LinupsFirewallService
             return false;
         }
 
+        //--- The 404 mail's ban link carries the offending URL in its query string;
+        //--- opening it (or saving the form) must not ban the admin
+        if ($this->isSignedBanUrlRequest($request)) {
+            return false;
+        }
+
         $keyword = $this->matchKeyword($request->fullUrl());
         if ($keyword === null) {
             return false;
@@ -118,6 +125,16 @@ class LinupsFirewallService
         }
 
         return null;
+    }
+
+    /**
+     * Exact path + valid signature: unsigned or tampered probes of the same path are still checked.
+     */
+    private function isSignedBanUrlRequest(Request $request): bool
+    {
+        return Route::has('linups-firewall.ban-url')
+            && '/' . $request->path() === route('linups-firewall.ban-url', [], false)
+            && $request->hasValidRelativeSignature();
     }
 
     /**
