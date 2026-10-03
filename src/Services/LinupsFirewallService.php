@@ -63,8 +63,8 @@ class LinupsFirewallService
         $request ??= request();
         $ip = $request->ip();
 
-        //--- Only IPv4 addresses are banned per request
-        if (! filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        //--- IPv6 addresses are stored as-is and banned on Cloudflare as their /64
+        if (! filter_var($ip, FILTER_VALIDATE_IP)) {
             return false;
         }
 

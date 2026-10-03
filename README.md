@@ -2,7 +2,8 @@
 
 Laravel package that blocks web crawlers. Every request URL is matched against the
 `keywords` table; a match returns `403`, stores the client IP in `banned_ips` and adds it
-to a Cloudflare IP list (which you reference from a Cloudflare WAF rule).
+to a Cloudflare IP list (which you reference from a Cloudflare WAF rule). Cloudflare lists
+do not accept single IPv6 addresses, so an IPv6 client is banned as its whole `/64`.
 
 ## Installation
 

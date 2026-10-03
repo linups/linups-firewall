@@ -50,15 +50,18 @@ class MiddlewareTest extends TestCase
         $this->get('/')->assertOk();
     }
 
-    public function test_ipv6_clients_are_not_banned(): void
+    public function test_ipv6_client_is_banned_as_its_64(): void
     {
+        Http::fake([self::LIST_ITEMS_URL => Http::response(['success' => true])]);
         Keyword::create(['keyword' => 'wp-login']);
 
-        $this->withServerVariables(['REMOTE_ADDR' => '2001:db8::1'])
+        $this->withServerVariables(['REMOTE_ADDR' => '2001:db8:1:2:3:4:5:6'])
             ->get('/wp-login.php')
-            ->assertOk();
+            ->assertForbidden();
 
-        $this->assertSame(0, BannedIp::count());
+        $this->assertTrue(BannedIp::where('ip', '2001:db8:1:2:3:4:5:6')->exists());
+        Http::assertSent(fn (Request $r) => $r->method() === 'POST'
+            && $r->data() === [['ip' => '2001:db8:1:2::/64']]);
     }
 
     public function test_keyword_cache_is_refreshed_when_keywords_change(): void
